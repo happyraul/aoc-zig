@@ -26,9 +26,13 @@ pub fn main() !void {
         //try stdout.print("{d}: {c}\n", .{index, char});
         if (char == '(') open += 1;
         if (char == ')') close += 1;
+        if (open - close == -1) {
+            try stdout.print("{d}", .{index});
+            break;
+        }
     }
 
-    try stdout.print("{d}", .{open - close});
+    //try stdout.print("{d}", .{open - close});
 
     try bw.flush(); // don't forget to flush!
 }
