@@ -20,13 +20,13 @@ pub fn main() !void {
     var area: u32 = 0;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         var box = try Box.init(line);
-        std.debug.print("{s} {d} {d}\n", .{ line, box.wrappingArea(), area });
+        std.debug.print("{s} {d}+{d}={d}, sum: {d}\n", .{ line, box.surfaceArea(), box.slackArea(), box.wrappingArea(), area });
         area += box.wrappingArea();
     }
 
-    try stdout.print("day 2: {d}", .{area});
+    try stdout.print("day 2: {d}\n", .{area});
 
-    try bw.flush(); // don't forget to flush!
+    try bw.flush();
 }
 
 pub const Box = struct {
@@ -57,7 +57,7 @@ pub const Box = struct {
             return box.w * box.h;
         } else if (box.w > box.l and box.w > box.h) {
             return box.l * box.h;
-        } else {
+        } else { // height is the biggest
             return box.l * box.w;
         }
     }
