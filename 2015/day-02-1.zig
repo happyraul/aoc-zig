@@ -5,7 +5,7 @@ const heap = std.heap;
 const io = std.io;
 const mem = std.mem;
 
-pub fn main() !void { 
+pub fn main() !void {
     var file = try fs.cwd().openFile("input-02.txt", .{});
     defer file.close();
 
@@ -20,7 +20,7 @@ pub fn main() !void {
     var area: u32 = 0;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         var box = try Box.init(line);
-        std.debug.print("{s} {d} {d}\n", .{line, box.wrappingArea(), area});
+        std.debug.print("{s} {d} {d}\n", .{ line, box.wrappingArea(), area });
         area += box.wrappingArea();
     }
 
