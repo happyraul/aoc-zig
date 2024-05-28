@@ -30,16 +30,16 @@ pub fn main() !void {
 }
 
 pub const Box = struct {
-    l: u16,
-    w: u16,
-    h: u16,
+    l: u5,
+    w: u5,
+    h: u5,
 
     pub fn init(dimensions: []const u8) !Box {
         var it = mem.splitScalar(u8, dimensions, 'x');
 
-        const l = try fmt.parseInt(u16, it.next().?, 10);
-        const w = try fmt.parseInt(u16, it.next().?, 10);
-        const h = try fmt.parseInt(u16, it.next().?, 10);
+        const l = try fmt.parseInt(u5, it.next().?, 10);
+        const w = try fmt.parseInt(u5, it.next().?, 10);
+        const h = try fmt.parseInt(u5, it.next().?, 10);
 
         return Box{
             .l = l,
@@ -49,16 +49,24 @@ pub const Box = struct {
     }
 
     fn surfaceArea(box: Box) u16 {
-        return 2 * box.l * box.w + 2 * box.l * box.h + 2 * box.w * box.h;
+        const l = @as(u16, box.l);
+        const w = @as(u16, box.w);
+        const h = @as(u16, box.h);
+
+        return 2 * (l * w + l * h + w * h);
     }
 
     fn slackArea(box: Box) u16 {
+        const l = @as(u16, box.l);
+        const w = @as(u16, box.w);
+        const h = @as(u16, box.h);
+
         if (box.l > box.w and box.l > box.h) {
-            return box.w * box.h;
+            return w * h;
         } else if (box.w > box.l and box.w > box.h) {
-            return box.l * box.h;
+            return l * h;
         } else { // height is the biggest
-            return box.l * box.w;
+            return l * w;
         }
     }
 
