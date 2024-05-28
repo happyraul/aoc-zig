@@ -23,7 +23,7 @@ pub fn main() !void {
     var close: i16 = 0;
 
     for (try in_stream.readAllAlloc(allocator, 7001), 1..) |char, index| {
-        //try stdout.print("{d}: {c}\n", .{index, char});
+        try stdout.print("{d}: {c}\n", .{index, char});
         if (char == '(') open += 1;
         if (char == ')') close += 1;
     }
