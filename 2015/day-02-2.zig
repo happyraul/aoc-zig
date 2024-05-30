@@ -17,11 +17,11 @@ pub fn main() !void {
     const stdout = bw.writer();
 
     var buf: [9]u8 = undefined;
-    var area: u21 = 0;
+    var area: u22 = 0;
     while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
         var box = try Box.init(line);
-        std.debug.print("{s} {d}+{d}={d}, sum: {d}\n", .{ line, box.surfaceArea(), box.slackArea(), box.wrappingArea(), area });
-        area += box.wrappingArea();
+        std.debug.print("{s} {d}+{d}={d}, sum: {d}\n", .{ line, box.wrapDistance(), box.volume(), box.ribbonLength(), area });
+        area += box.ribbonLength();
     }
 
     try stdout.print("day 2: {d}\n", .{area});
@@ -48,29 +48,29 @@ pub const Box = struct {
         };
     }
 
-    fn surfaceArea(box: Box) u16 {
-        const l = @as(u16, box.l);
-        const w = @as(u16, box.w);
-        const h = @as(u16, box.h);
+    fn volume(box: Box) u15 {
+        const l = @as(u15, box.l);
+        const w = @as(u15, box.w);
+        const h = @as(u15, box.h);
 
-        return 2 * (l * w + l * h + w * h);
+        return l * w * h;
     }
 
-    fn slackArea(box: Box) u10 {
-        const l = @as(u10, box.l);
-        const w = @as(u10, box.w);
-        const h = @as(u10, box.h);
+    fn wrapDistance(box: Box) u7 {
+        const l = @as(u7, box.l);
+        const w = @as(u7, box.w);
+        const h = @as(u7, box.h);
 
         if (l > w and l > h) {
-            return w * h;
+            return 2 * (w + h);
         } else if (w >= l and w > h) {
-            return l * h;
+            return 2 * (l + h);
         } else { // height is the biggest
-            return l * w;
+            return 2 * (l + w);
         }
     }
 
-    fn wrappingArea(box: Box) u16 {
-        return box.surfaceArea() + box.slackArea();
+    fn ribbonLength(box: Box) u15 {
+        return box.wrapDistance() + box.volume();
     }
 };
