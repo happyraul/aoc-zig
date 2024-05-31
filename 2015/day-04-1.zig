@@ -33,7 +33,7 @@ pub fn main() !void {
         candidate += 1;
     }
 
-    try stdout.print("day 3: {s} {s} {d}\n", .{ fmt.fmtSliceHexLower(&out), input, candidate - 1 });
+    try stdout.print("day 4: {s} {s} {d}\n", .{ fmt.fmtSliceHexLower(&out), input, candidate - 1 });
 
     try bw.flush();
 }
