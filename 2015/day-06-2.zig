@@ -20,15 +20,15 @@ pub fn main() !void {
     var in_stream = br.reader();
 
     // initialize
-    var brightness_values: [size]@Vector(size, i7) = undefined;
+    var brightness_values: [size]@Vector(size, u6) = undefined;
     for (brightness_values, 0..) |_, idx| {
         brightness_values[idx] = @splat(0);
     }
 
     var buf: [33]u8 = undefined;
     var instruction: Instruction = undefined;
-    var mask: @Vector(size, i3) = undefined;
-    var positive_mask: @Vector(size, i3) = undefined;
+    var mask: @Vector(size, u2) = undefined;
+    var positive_mask: @Vector(size, u2) = undefined;
     var positives: @Vector(size, bool) = undefined;
     const zero: @Vector(size, i1) = @splat(0);
 
@@ -38,8 +38,8 @@ pub fn main() !void {
         for (instruction.y1..instruction.y2 + 1) |row| {
             if (mem.eql(u8, instruction.action, "off")) {
                 positives = getPositives(brightness_values[row]);
-                positive_mask = @select(i3, positives, mask, zero);
-                brightness_values[row] += positive_mask;
+                positive_mask = @select(u2, positives, mask, zero);
+                brightness_values[row] -= positive_mask;
             } else {
                 brightness_values[row] += mask;
             }
@@ -59,22 +59,11 @@ fn getPositives(brightness_values: @Vector(size, i7)) @Vector(size, bool) {
     return brightness_values > zero;
 }
 
-fn printCount(brightness_values: [size]@Vector(size, i7)) !void {
-    const zero: @Vector(size, i4) = @splat(0);
-    var to_keep: [size]@Vector(size, bool) = undefined;
-    for (to_keep, 0..) |_, idx| {
-        to_keep[idx] = brightness_values[idx] > zero;
-    }
-
-    var lights: [size]@Vector(size, i10) = undefined;
-    for (lights, 0..) |_, idx| {
-        lights[idx] = @select(i10, to_keep[idx], brightness_values[idx], zero);
-    }
-
-    var sum: i32 = 0;
-    var counter: @Vector(1001, i32) = undefined;
-    for (lights, 0..) |_, idx| {
-        counter = lights[idx];
+fn printCount(brightness_values: [size]@Vector(size, u6)) !void {
+    var sum: u32 = 0;
+    var counter: @Vector(1001, u32) = undefined;
+    for (brightness_values, 0..) |_, idx| {
+        counter = brightness_values[idx];
         sum += @reduce(.Add, counter);
     }
     try stdout.print("{d}\n", .{sum});
@@ -135,7 +124,7 @@ const Instruction = struct {
         };
     }
 
-    fn getMask(self: Instruction) @Vector(size, i3) {
+    fn getMask(self: Instruction) @Vector(size, u2) {
         var mask: @Vector(size, u1) = undefined;
         var mask_int: u1001 = undefined;
 
@@ -145,16 +134,14 @@ const Instruction = struct {
         mask_int = math.pow(u1001, 2, mask_size) - 1 << @truncate(size - mask_size - (size - endX));
         mask = @bitCast(mask_int);
 
-        var brightness: i3 = undefined;
-        if (mem.eql(u8, self.action, "on")) {
-            brightness = 1;
-        } else if (mem.eql(u8, self.action, "toggle")) {
+        var brightness: u2 = undefined;
+        if (mem.eql(u8, self.action, "toggle")) {
             brightness = 2;
         } else {
-            brightness = -1;
+            brightness = 1;
         }
 
-        const result: @Vector(size, i3) = @splat(brightness);
+        const result: @Vector(size, u2) = @splat(brightness);
         return result * mask;
     }
 };
